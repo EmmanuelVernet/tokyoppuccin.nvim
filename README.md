@@ -126,3 +126,7 @@ bufferline, dap, lazy, mason, noice, rainbow-delimiters.
   hand-maintained here or generated from the Zed JSON.
 - **`extras/`:** optionally export the palette to other apps (Zed already exists;
   could add tmux, kitty, wezterm) as tokyonight does.
+- **lualine mode colors:** `lua/lualine/themes/tokyoppuccin-storm.lua` currently maps
+  normal=blue, insert=green, visual=mauve, replace=red, command=yellow, terminal=teal.
+  Matches the old tokyonight feel; revisit the accents later if a more Catppuccin-y
+  mode palette is wanted.
