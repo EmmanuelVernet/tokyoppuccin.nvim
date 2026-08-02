@@ -15,6 +15,7 @@ function M.get(c, opts)
 
   merge(require("tokyoppuccin.groups.editor")(c, opts))
   merge(require("tokyoppuccin.groups.syntax")(c, opts))
+  merge(require("tokyoppuccin.groups.plugins").get(c, opts))
 
   return groups
 end
