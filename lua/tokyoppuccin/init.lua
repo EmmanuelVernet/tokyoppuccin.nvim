@@ -23,7 +23,8 @@ function M.load(style)
 
   local set = vim.api.nvim_set_hl
   for group, spec in pairs(groups) do
-    set(0, group, spec)
+    -- allow tokyonight-style string values as links ("Foo" == { link = "Foo" })
+    set(0, group, type(spec) == "string" and { link = spec } or spec)
   end
 
   if opts.terminal_colors then
