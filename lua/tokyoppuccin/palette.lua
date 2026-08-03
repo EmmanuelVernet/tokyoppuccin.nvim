@@ -26,6 +26,7 @@ M.storm = {
 
   -- Chrome
   border         = "#212538", -- border / pane_group.border
+  border_accent  = "#0db9d7", -- colored border + picker titles = vivid cyan; swap to taste
   line_nr        = "#474f75", -- editor.line_number
 
   -- Accents / syntax

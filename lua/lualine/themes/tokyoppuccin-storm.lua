@@ -10,8 +10,8 @@ local function mode(accent)
 end
 
 local normal = {
-  a = { fg = c.bg, bg = c.blue, gui = "bold" },
-  b = { fg = c.blue, bg = c.surface },
+  a = { fg = c.bg, bg = c.variable, gui = "bold" }, -- NORMAL badge = cyan, matches picker borders
+  b = { fg = c.variable, bg = c.surface },
   c = { fg = c.fg_editor, bg = c.bg },
 }
 

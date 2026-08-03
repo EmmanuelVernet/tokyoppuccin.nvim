@@ -10,7 +10,7 @@ local util = require("tokyoppuccin.util")
 
 return function(c, opts)
   local bg = opts.transparent and "NONE" or c.bg
-  local dark = opts.transparent and "NONE" or c.bg_dark -- dimmed panel
+  local dark = opts.transparent and "NONE" or c.bg -- picker panels match editor bg
   local blend = function(fg, a) return util.blend_bg(c, fg, a) end
 
   -- rainbow indent (tokyonight iterates c.rainbow); accents in warm->cool order
@@ -63,9 +63,9 @@ return function(c, opts)
     SnacksInputBorder = { fg = c.yellow },
     SnacksInputTitle  = { fg = c.yellow },
     -- Picker accents
-    SnacksPickerInputBorder    = { fg = c.orange, bg = dark },
-    SnacksPickerInputTitle     = { fg = c.orange, bg = dark },
-    SnacksPickerBoxTitle       = { fg = c.orange, bg = dark },
+    SnacksPickerInputBorder    = { fg = c.border_accent, bg = dark },
+    SnacksPickerInputTitle     = { fg = c.border_accent, bg = dark },
+    SnacksPickerBoxTitle       = { fg = c.border_accent, bg = dark },
     SnacksPickerSelected       = { fg = c.hotpink },
     SnacksPickerToggle         = "SnacksProfilerBadgeInfo",
     SnacksPickerPickWinCurrent = { fg = c.fg, bg = c.hotpink, bold = true },
@@ -81,13 +81,13 @@ return function(c, opts)
     SnacksPickerInput         = { bg = dark },
     SnacksPickerBox           = { bg = dark },
     SnacksPickerPreview       = { bg = bg },
-    SnacksPickerBorder        = { fg = c.border, bg = dark },
-    SnacksPickerListBorder    = { fg = c.border, bg = dark },
-    SnacksPickerBoxBorder     = { fg = c.border, bg = dark },
-    SnacksPickerPreviewBorder = { fg = c.border, bg = bg },
+    SnacksPickerBorder        = { fg = c.border_accent, bg = dark },
+    SnacksPickerListBorder    = { fg = c.border_accent, bg = dark },
+    SnacksPickerBoxBorder     = { fg = c.border_accent, bg = dark },
+    SnacksPickerPreviewBorder = { fg = c.border_accent, bg = bg },
     SnacksPickerListCursorLine    = { bg = c.bg_active },
     SnacksPickerPreviewCursorLine = { bg = c.cursor_line },
-    SnacksPickerTitle         = { fg = c.orange, bg = dark, bold = true },
+    SnacksPickerTitle         = { fg = c.border_accent, bg = dark, bold = true },
     SnacksPickerPrompt        = { fg = c.pink },
     -- Names
     SnacksPickerFile        = { fg = c.fg },
