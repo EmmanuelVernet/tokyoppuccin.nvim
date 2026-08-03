@@ -10,7 +10,7 @@ return function(c, opts)
     -- Editor / UI
     Normal       = { fg = c.fg_editor, bg = bg },
     NormalFloat  = { fg = c.fg_editor, bg = bg },
-    FloatBorder  = { fg = c.border, bg = bg },
+    FloatBorder  = { fg = c.border_accent, bg = bg },
     FloatTitle   = { fg = c.fg, bold = true },
     Cursor       = { fg = c.bg, bg = c.rosewater }, -- vim.normal.background
     CursorLine   = { bg = c.cursor_line },
@@ -21,8 +21,8 @@ return function(c, opts)
     FoldColumn   = { fg = c.line_nr, bg = bg },
     Folded       = { fg = c.fg_muted, bg = c.surface },
     ColorColumn  = { bg = c.surface },
-    VertSplit    = { fg = c.border },
-    WinSeparator = { fg = c.border },
+    VertSplit    = { fg = c.border_accent },
+    WinSeparator = { fg = c.border_accent },
     Pmenu        = { fg = c.fg_editor, bg = c.surface },
     PmenuSel     = { fg = c.fg, bg = c.bg_active },
     PmenuSbar    = { bg = c.surface },
