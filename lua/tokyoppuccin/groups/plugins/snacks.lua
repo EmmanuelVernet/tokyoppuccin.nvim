@@ -10,7 +10,7 @@ local util = require("tokyoppuccin.util")
 
 return function(c, opts)
   local bg = opts.transparent and "NONE" or c.bg
-  local dark = opts.transparent and "NONE" or c.bg_dark -- dimmed panel
+  local dark = opts.transparent and "NONE" or c.bg -- picker panels match editor bg
   local blend = function(fg, a) return util.blend_bg(c, fg, a) end
 
   -- rainbow indent (tokyonight iterates c.rainbow); accents in warm->cool order
