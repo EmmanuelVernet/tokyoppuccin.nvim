@@ -63,9 +63,9 @@ return function(c, opts)
     SnacksInputBorder = { fg = c.yellow },
     SnacksInputTitle  = { fg = c.yellow },
     -- Picker accents
-    SnacksPickerInputBorder    = { fg = c.orange, bg = dark },
-    SnacksPickerInputTitle     = { fg = c.orange, bg = dark },
-    SnacksPickerBoxTitle       = { fg = c.orange, bg = dark },
+    SnacksPickerInputBorder    = { fg = c.border_accent, bg = dark },
+    SnacksPickerInputTitle     = { fg = c.border_accent, bg = dark },
+    SnacksPickerBoxTitle       = { fg = c.border_accent, bg = dark },
     SnacksPickerSelected       = { fg = c.hotpink },
     SnacksPickerToggle         = "SnacksProfilerBadgeInfo",
     SnacksPickerPickWinCurrent = { fg = c.fg, bg = c.hotpink, bold = true },
@@ -87,7 +87,7 @@ return function(c, opts)
     SnacksPickerPreviewBorder = { fg = c.border_accent, bg = bg },
     SnacksPickerListCursorLine    = { bg = c.bg_active },
     SnacksPickerPreviewCursorLine = { bg = c.cursor_line },
-    SnacksPickerTitle         = { fg = c.orange, bg = dark, bold = true },
+    SnacksPickerTitle         = { fg = c.border_accent, bg = dark, bold = true },
     SnacksPickerPrompt        = { fg = c.pink },
     -- Names
     SnacksPickerFile        = { fg = c.fg },
