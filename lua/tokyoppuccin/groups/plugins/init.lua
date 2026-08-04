@@ -5,6 +5,7 @@
 local M = {}
 
 M.enabled = {
+  "mini_icons",
   "snacks",
 }
 
