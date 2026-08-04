@@ -22,6 +22,7 @@ return function(c, opts)
     Comment      = comment({ fg = c.comment }),
     String       = { fg = c.green },
     Character    = { fg = c.teal },
+    Constant     = { fg = c.orange },
     Number       = { fg = c.orange },
     Boolean      = { fg = c.orange },
     Float        = { fg = c.orange },
