@@ -39,11 +39,15 @@ return function(c, opts)
     SnacksNotifierBorderWarn  = { fg = blend(c.yellow, 0.4), bg = bg },
     SnacksNotifierIconWarn    = { fg = c.yellow },
     SnacksNotifierTitleWarn   = { fg = c.yellow },
-    -- Dashboard
-    SnacksDashboardDesc    = { fg = c.cyan },
-    SnacksDashboardFooter  = { fg = c.cyan },
+    -- Dashboard. Diverges from tokyonight: its Desc=cyan / Icon+Footer=blue1 both
+    -- landed on c.cyan here (the blue1->cyan mapping), flattening three roles into
+    -- one punctuation-grade tone. Desc goes pink (same "act here" sense as
+    -- SnacksPickerPrompt, and magenta-side so it doesn't muddy the orange keys),
+    -- icons take the border_accent already used for picker titles.
+    SnacksDashboardDesc    = { fg = c.pink },
+    SnacksDashboardFooter  = { fg = c.border_accent },
     SnacksDashboardHeader  = { fg = c.blue },
-    SnacksDashboardIcon    = { fg = c.cyan },
+    SnacksDashboardIcon    = { fg = c.border_accent },
     SnacksDashboardKey     = { fg = c.orange },
     SnacksDashboardSpecial = { fg = c.purple },
     SnacksDashboardDir     = { fg = c.placeholder },
