@@ -3,81 +3,53 @@
 A Neovim colorscheme ported 1:1 from the Zed theme **Tokyoppuccin Storm** — a
 Catppuccin-flavored take on Tokyo Night Storm.
 
-> **Status: scaffold.** The directory tree exists but the files are empty. This
-> README is the working spec for what to build. Source material lives in the
-> personal config at `~/.config/nvim`.
+> **Status: working, not yet distributable.** The theme is built and in daily use.
+> This README is the working notes: what exists, what's known-broken, and what
+> blocks handing it to other developers. Rewrite it as user-facing docs (install,
+> config, screenshots) once the backlog below is cleared.
 
-## Objective
+## Install
 
-Turn the current `~/.config/nvim` prototype into a **standalone, distributable
-colorscheme plugin** in the mold of
-[folke/tokyonight.nvim](https://github.com/folke/tokyonight.nvim):
-
-- Installable with any plugin manager, activated via `:colorscheme tokyoppuccin-storm`.
-- **Zero dependency on tokyonight** — must set every highlight group itself.
-- Configurable through `require("tokyoppuccin").setup({...})`.
-- A single source of truth for the palette and highlight mappings.
-- Ships its own treesitter query overrides and plugin integrations.
-
-## Source material (in `~/.config/nvim`)
-
-The prototype is split across a few files. Port them, don't reinvent:
-
-| Source file | What to reuse | Target |
-| --- | --- | --- |
-| `colors/tokyoppuccin-storm.lua` | Full standalone theme: palette `c`, editor/UI groups, diagnostics, diff, syntax, treesitter, LSP, git signs, terminal colors. **This is the seed.** | split across `palette.lua`, `groups/editor.lua`, `groups/syntax.lua` |
-| `lua/tokyoppuccin.lua` | Syntax-only overlay (palette `p` + `M.groups()`). **Byte-for-byte duplicate** of the syntax half of the standalone file. | fold into `groups/syntax.lua` — do NOT keep two copies |
-| `after/queries/ruby/highlights.scm` | Re-captures `require`/`require_relative`/`load`/`autoload` as `@keyword.import` (hot pink). | `after/queries/ruby/highlights.scm` (copy as-is) |
-| `lua/plugins/colorscheme.lua` | **Do not port** — this is LazyVim glue, not part of the theme. | — |
-
-### Palette / port notes worth preserving
-
-These decisions from the prototype comments must survive the refactor:
-
-- `this`/`super`/`self` render **teal** (`#46c4bb`, `variable.special`), not the
-  red the theme JSON lists for `variable.builtin`. Match the rendered color.
-- The whole `keyword` family is **purple**; only the import family
-  (`import`/`from`/`export`/`require`/`use`/`package`) and preprocessor
-  directives get the **hotpink** accent.
-- Ruby instance/class vars (`@foo`, `@@foo`) arrive as `@variable.member` but
-  must stay **teal** — scoped per-language (`@variable.member.ruby`).
-- RuboCop `Style/*` offenses arrive at INFO severity → render in a bluer teal
-  (`diag_info = #0db9d7`), distinct from Zed's greener info.
-- `@lsp.type.class`/`namespace` link to `@type` so CamelCase decls and refs match.
-
-## Target structure
-
-```
-tokyoppuccin.nvim/
-├── colors/
-│   └── tokyoppuccin-storm.lua   -- entry point; thin: require("tokyoppuccin").load("storm")
-├── lua/tokyoppuccin/
-│   ├── init.lua                 -- setup(opts) + load(style)
-│   ├── config.lua               -- default opts + user merge
-│   ├── palette.lua              -- THE color table (single source of truth)
-│   ├── theme.lua                -- assemble all groups from palette + config
-│   ├── util.lua                 -- blend/darken/lighten helpers
-│   └── groups/
-│       ├── init.lua             -- collect editor + syntax + plugins
-│       ├── editor.lua           -- UI shell (Normal, Pmenu, StatusLine, diagnostics, diff, terminal…)
-│       ├── syntax.lua           -- legacy syntax + @treesitter + @lsp (deduped, single copy)
-│       └── plugins/
-│           ├── init.lua         -- dispatch to enabled integrations
-│           ├── lualine.lua
-│           ├── telescope.lua
-│           ├── gitsigns.lua
-│           ├── cmp.lua
-│           └── treesitter.lua
-├── after/queries/ruby/highlights.scm
-├── README.md
-└── LICENSE
+```lua
+{ "EmmanuelVernet/tokyoppuccin.nvim", lazy = false, priority = 1000 }
 ```
 
-## Config API to implement
+```vim
+:colorscheme tokyoppuccin-storm
+```
+
+Note the `-storm` suffix is currently **required** — see backlog item 9.
+
+## Current state
+
+```
+colors/tokyoppuccin-storm.lua      -- thin entry point -> require("tokyoppuccin").load("storm")
+lua/tokyoppuccin/
+├── init.lua                       -- setup(opts) + load(style); hi clear, apply, terminal colors
+├── config.lua                     -- defaults + vim.tbl_deep_extend user merge
+├── palette.lua                    -- THE color table, keyed by style
+├── theme.lua                      -- build(opts) -> groups, colors, opts
+├── util.lua                       -- blend helpers
+└── groups/
+    ├── init.lua                   -- editor + syntax + plugins
+    ├── editor.lua                 -- UI shell, diagnostics, diff, git signs
+    ├── syntax.lua                 -- legacy syntax + @treesitter + @lsp (single copy)
+    └── plugins/
+        ├── init.lua               -- dumb `enabled` list, no auto-detect machinery
+        ├── mini_icons.lua
+        └── snacks.lua             -- notifier, dashboard, profiler, indent, input, picker, explorer
+lua/lualine/themes/tokyoppuccin-storm.lua
+after/queries/ruby/highlights.scm
+```
+
+Storm is the only variant. The loader is keyed on `style`, so adding one is just
+another palette table.
+
+## Config API
 
 ```lua
 require("tokyoppuccin").setup({
-  style = "storm",          -- only variant for now; leave room for more
+  style = "storm",
   transparent = false,      -- clear Normal/NormalFloat/SignColumn backgrounds
   terminal_colors = true,   -- set vim.g.terminal_color_*
   styles = {
@@ -86,47 +58,171 @@ require("tokyoppuccin").setup({
     functions = {},
     variables = { italic = true },
   },
-  on_colors = function(colors) end,       -- mutate palette before groups build
+  on_colors = function(colors) end,         -- mutate palette before groups build
   on_highlights = function(hl, colors) end, -- final override hook
-  plugins = { all = false, auto = true },  -- which integrations to load
 })
 ```
 
-`colors/tokyoppuccin-storm.lua` stays thin — it just calls
-`require("tokyoppuccin").load("storm")` so `:colorscheme` and lazy managers work.
+There is no `plugins = { all, auto }` option — `groups/plugins/init.lua` is a
+hand-maintained `enabled` list on purpose. Add a file, add its name.
 
-## Build checklist
+## Port notes worth preserving
 
-- [ ] `palette.lua` — lift the `c` table from `colors/tokyoppuccin-storm.lua`; one source of truth.
-- [ ] `util.lua` — hex blend helpers (needed for transparent + selection approximations).
-- [ ] `config.lua` — defaults + `vim.tbl_deep_extend` user merge.
-- [ ] `groups/editor.lua` — UI shell + diagnostics + diff + git signs + terminal from the standalone file.
-- [ ] `groups/syntax.lua` — merge the two duplicate syntax tables into one; honor `styles.*` toggles.
-- [ ] `groups/plugins/*` — start with the MVP set below; expand toward tokyonight parity.
-- [ ] `theme.lua` — assemble groups, apply `on_colors`/`on_highlights`, set `vim.g.colors_name`.
-- [ ] `init.lua` — `setup()` stores opts; `load()` does `hi clear`/`syntax reset`, builds, applies.
-- [ ] `colors/tokyoppuccin-storm.lua` — thin entry point.
-- [ ] `after/queries/ruby/highlights.scm` — copy from prototype.
-- [ ] README rewrite (user-facing: install, config, screenshots), LICENSE, screenshots.
+Decisions that are not derivable from the code. Match the **rendered** Zed color,
+not the theme-JSON scope name.
 
-### Plugin integration coverage
+- `this`/`super`/`self` render **teal** (`#46c4bb`, `variable.special`), not the
+  red the theme JSON lists for `variable.builtin`.
+- The whole `keyword` family is **purple**; only import / exception / directive
+  get the **hotpink** accent.
+- Ruby instance/class vars (`@foo`, `@@foo`) arrive as `@variable.member` but must
+  stay **teal** — scoped per-language via `@variable.member.ruby`.
+- RuboCop `Style/*` offenses arrive at INFO severity → bluer teal
+  (`diag_info = #0db9d7`), distinct from Zed's greener info `#81c8be`.
+- `@lsp.type.class`/`namespace` link to `@type` so CamelCase decls and refs match.
+- `@lsp.type.method.ruby` is cleared so bare calls keep treesitter `@variable`
+  (teal) while explicit `.method` calls stay `@function.method.call` (blue).
+- `snacks.lua` part 2 (explorer sidebar bg / names / git status) is **beyond**
+  tokyonight parity — added because the flat sidebar and grey filenames were the
+  specific gripes. Drop it for pure parity.
 
-**MVP:** treesitter, LSP semantic tokens, gitsigns, telescope, lualine, cmp/blink.
-**Full (tokyonight parity, later):** neo-tree, which-key, nvim-notify,
-indent-blankline, treesitter-context, dashboard/alpha, trouble, flash, mini.*,
-bufferline, dap, lazy, mason, noice, rainbow-delimiters.
+---
+
+# Backlog
+
+Findings from a full audit, ranked by how often a user would see them.
+
+## Tier 1 — visible daily
+
+### 1. Completion menu is monochrome
+
+`blink.cmp`'s `BlinkCmpKind*` groups link `PmenuKind` → `Pmenu`
+(`blink/cmp/highlights.lua:21-24`), so every kind icon — function, variable,
+class, snippet — renders one flat `fg_editor`. Same root cause flattens
+`BlinkCmpLabelDetail` / `Description` / `Source` via `PmenuExtra`.
+
+Fix: a `groups/kinds.lua` in the mold of tokyonight's, generating per-kind colors
+and feeding cmp/blink (and later navic/aerial/trouble). Biggest single looks win
+available.
+
+### 2. `PmenuSel` is effectively invisible
+
+`groups/editor.lua:26-27`:
+
+```lua
+Pmenu    = { fg = c.fg_editor, bg = c.surface },   -- #292c3c
+PmenuSel = { fg = c.fg, bg = c.bg_active },        -- #303446
+```
+
+Contrast ratio **1.13:1** — you cannot tell which completion row is selected.
+`element_hover #414559` gives 1.45:1 and is currently an *unused* palette entry
+whose documented Zed role is exactly this (`element.hover`). Add `bold` too.
+
+### 3. Message and prompt colors are Neovim's, not the theme's
+
+After `hi clear`, Neovim 0.10+'s default colorscheme backfills every group the
+theme doesn't set. Currently leaking through:
+
+| Group | Renders as | Should be |
+| --- | --- | --- |
+| `ErrorMsg` | `#FFC0B9` NvimLightRed | `c.red #e78284` |
+| `WarningMsg` | `#FCE094` NvimLightYellow | `c.yellow #e5c890` |
+| `ModeMsg` | `#B3F6C0` NvimLightGreen | `c.green` |
+| `MoreMsg`, `Question` | `#8CF8F7` neon cyan | `c.diag_info` |
+| `QuickFixLine` | `#8CF8F7`, fg-only | needs a **bg** |
+| `SpellBad` / `Cap` / `Local` / `Rare` | Neovim `sp` colors | theme severities |
+| `DiagnosticDeprecated` | Neovim red `sp` | `c.red` |
+
+`QuickFixLine` is the worst: fg-only means no selected-row background in quickfix
+*or* Trouble, and that cyan appears nowhere in the palette.
+
+### 4. Markdown headings are flat
+
+`groups/syntax.lua:145` sets `@markup.heading` = `c.fg` bold and nothing for
+`.1`–`.6`, so every heading level looks identical. Also unset: `Bold`, `Italic`,
+`@markup.quote`, `@markup.math`.
+
+Worth doing before the user-facing README rewrite — that work happens in markdown.
+
+## Tier 2 — dead code and self-contradictions
+
+### 5. Five 0-byte files
+
+`groups/plugins/{cmp,gitsigns,lualine,telescope,treesitter}.lua` are empty and not
+in `M.enabled`. Delete them. The base groups in `editor.lua` already carry
+telescope/cmp/lualine/gitsigns.
+
+### 6. Four unused palette keys, three of which contradict the "1:1 port" claim
+
+| Key | Documented Zed role | Unused; theme instead uses |
+| --- | --- | --- |
+| `bg_dark #1d202b` | `tab.inactive_background` | `TabLine` = `element` |
+| `wrap_guide #1b1e2e` | `editor.wrap_guide` | `ColorColumn` = `surface` |
+| `element_hover #414559` | `element.hover` | — (see item 2) |
+| `border #212538` | `border` / `pane_group.border` | every float/split = `border_accent` |
+
+`border` going unused is deliberate — floats and splits use the vivid cyan
+`border_accent` by choice. Either delete the key or comment it as intentional so
+it stops reading as an oversight.
+
+### 7. lualine theme bypasses the palette API
+
+`lua/lualine/themes/tokyoppuccin-storm.lua:6` reads `require("tokyoppuccin.palette").storm`
+directly instead of `.get(style)`, so it ignores `on_colors`. A user who remaps a
+color gets a statusline that doesn't match their own config. Becomes a real bug the
+moment a second variant exists.
+
+### 8. Terminal ANSI 5 and 13 are identical
+
+Both `#f4b8e4`. Bright magenta isn't brighter than magenta.
+
+## Tier 3 — distribution blockers
+
+### 9. `:colorscheme tokyoppuccin` fails
+
+Only `colors/tokyoppuccin-storm.lua` exists. Every dev's muscle memory and every
+`install = { colorscheme = { "tokyoppuccin" } }` breaks. Needs an alias entry
+point, and the same for the lualine theme name.
+
+### 10. A treesitter query override ships to every user
+
+`after/queries/ruby/highlights.scm` re-captures `require` / `require_relative` /
+`load` / `autoload` as `@keyword.import`. A colorscheme silently changing what the
+*parser* captures is surprising, and it survives switching to another theme. Put it
+behind a config flag, default off.
+
+### 11. Two config knobs are untested surface area
+
+`styles.keywords` and `styles.functions` default to `{}` and nothing ever populates
+them. They work, but no one has exercised them.
+
+### 12. Missing plugin coverage
+
+Installed here and currently running on fallbacks: `bufferline.nvim`,
+`which-key.nvim`, `noice.nvim`, `trouble.nvim`, `todo-comments.nvim`. Toward
+tokyonight parity, later: neo-tree, indent-blankline, treesitter-context, flash,
+other `mini.*`, dap, lazy, mason, rainbow-delimiters.
+
+---
+
+## Recently fixed
+
+- **`mini.icons` had no groups at all.** mini's own `default = true` fallbacks
+  linked `Cyan`→`DiagnosticHint` (grey), `Orange`→`DiagnosticWarn` (identical to
+  Yellow), `Purple`→`Constant`. Added `groups/plugins/mini_icons.lua`.
+- **`Constant` was never defined**, so it fell back to Neovim's `NvimLightGrey2` —
+  greying purple icons plus all legacy non-treesitter constants. Now `c.orange`.
+- **Dashboard collapsed three roles into one tone.** tokyonight's `Desc`=cyan and
+  `Icon`/`Footer`=blue1 both landed on `c.cyan` via the `blue1->cyan` mapping. Desc
+  is now `c.pink`, Icon/Footer `c.border_accent`.
 
 ## Open decisions
 
-- **Variants:** ship only `storm`, or also derive `night`/`moon`/`day` like
-  tokyonight? Currently storm-only; keep the loader keyed on `style` so adding
-  variants later is just another palette.
-- **Zed source of truth:** the theme originates from the Zed theme repo
-  (`EmmanuelVernet/zed-tokyoppuccin`). Decide whether the palette is
-  hand-maintained here or generated from the Zed JSON.
-- **`extras/`:** optionally export the palette to other apps (Zed already exists;
-  could add tmux, kitty, wezterm) as tokyonight does.
-- **lualine mode colors:** `lua/lualine/themes/tokyoppuccin-storm.lua` currently maps
-  normal=blue, insert=green, visual=mauve, replace=red, command=yellow, terminal=teal.
-  Matches the old tokyonight feel; revisit the accents later if a more Catppuccin-y
-  mode palette is wanted.
+- **Variants:** storm-only, or derive `night`/`moon`/`day` like tokyonight?
+- **Zed source of truth:** the theme originates in `EmmanuelVernet/zed-tokyoppuccin`.
+  Hand-maintain the palette here, or generate it from the Zed JSON?
+- **`extras/`:** export the palette to other apps (tmux, kitty, wezterm) as
+  tokyonight does?
+- **lualine mode colors:** currently normal=cyan, insert=green, visual=mauve,
+  replace=red, command=yellow, terminal=teal. Revisit if a more Catppuccin-y mode
+  palette is wanted.
