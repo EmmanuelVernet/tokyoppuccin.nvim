@@ -43,10 +43,11 @@ return function(c, opts)
     -- landed on c.cyan here (the blue1->cyan mapping), flattening three roles into
     -- one punctuation-grade tone. Desc goes pink (same "act here" sense as
     -- SnacksPickerPrompt, and magenta-side so it doesn't muddy the orange keys),
-    -- icons take the border_accent already used for picker titles.
+    -- header/icons/footer take the border_accent already used for picker titles so
+    -- the whole hero reads as the theme's signature cyan.
     SnacksDashboardDesc    = { fg = c.pink },
     SnacksDashboardFooter  = { fg = c.border_accent },
-    SnacksDashboardHeader  = { fg = c.blue },
+    SnacksDashboardHeader  = { fg = c.border_accent },
     SnacksDashboardIcon    = { fg = c.border_accent },
     SnacksDashboardKey     = { fg = c.orange },
     SnacksDashboardSpecial = { fg = c.purple },
