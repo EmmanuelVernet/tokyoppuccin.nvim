@@ -125,7 +125,9 @@ return function(c, opts)
     ["@keyword.export"]              = { fg = c.cyan2 },
     -- punctuation
     ["@punctuation.delimiter"]       = { fg = c.cyan },
-    ["@punctuation.bracket"]         = { fg = c.cyan },
+    -- Brackets recede (tokyonight puts them on fg_dark, same hex as fg_editor):
+    -- they're the densest token in any file and shouldn't outshine what they wrap.
+    ["@punctuation.bracket"]         = { fg = c.fg_editor },
     ["@punctuation.special"]         = { fg = c.pink },
     ["@punctuation.special.symbol"]  = { fg = c.constructor },
     -- comments
