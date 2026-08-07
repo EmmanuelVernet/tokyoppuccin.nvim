@@ -43,8 +43,13 @@ M.storm = {
   blue           = "#7aa2f7", -- function(.call/.method), property
   blue2          = "#8caaee", -- variable.member, tag, link_uri, comment.hint
   variable       = "#0db9d7", -- variable
-  cyan           = "#7ac5e2", -- punctuation(.delimiter/.bracket/.list_marker)
-  cyan2          = "#99d1db", -- operator, keyword.export, link_text.hover
+  declaration    = "#5ed2ff", -- ruby's declarative macros: attr_reader/_writer/_accessor,
+                              -- module_function, include/extend/prepend/refine/using.
+                              -- Same hue as `variable`, +24 lightness, so they read as
+                              -- language machinery rather than as values (orange).
+  cyan           = "#7dcfff", -- punctuation(.delimiter/.list_marker) — tokyonight cyan
+                              -- (brackets sit on fg_editor, see syntax.lua)
+  cyan2          = "#89ddff", -- operator, keyword.export, link_text.hover — tokyonight blue5
   purple         = "#bb9af7", -- keyword, keyword.function
   mauve          = "#ca9ee6", -- constant.macro, type.builtin, tag.doctype, accent
   hotpink        = "#ff8bcb", -- keyword.modifier/type/coroutine/operator/import/repeat/

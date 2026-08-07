@@ -95,6 +95,10 @@ return function(c, opts)
     -- functions
     ["@function"]              = fn({ fg = c.blue }),
     ["@function.builtin"]      = { fg = c.orange },
+    -- Ruby scopes @function.builtin to exactly nine declarative macros
+    -- (attr_*, module_function, include/extend/prepend/refine/using) — `puts` and
+    -- friends are not in it — so this narrows cleanly without a query override.
+    ["@function.builtin.ruby"] = { fg = c.declaration },
     ["@function.call"]         = fn({ fg = c.blue }),
     ["@function.macro"]        = { fg = c.teal },
     ["@function.method"]       = fn({ fg = c.blue }),
@@ -121,7 +125,9 @@ return function(c, opts)
     ["@keyword.export"]              = { fg = c.cyan2 },
     -- punctuation
     ["@punctuation.delimiter"]       = { fg = c.cyan },
-    ["@punctuation.bracket"]         = { fg = c.cyan },
+    -- Brackets recede (tokyonight puts them on fg_dark, same hex as fg_editor):
+    -- they're the densest token in any file and shouldn't outshine what they wrap.
+    ["@punctuation.bracket"]         = { fg = c.fg_editor },
     ["@punctuation.special"]         = { fg = c.pink },
     ["@punctuation.special.symbol"]  = { fg = c.constructor },
     -- comments
@@ -166,6 +172,11 @@ return function(c, opts)
     ["@lsp.type.parameter"]  = { link = "@variable.parameter" },
     ["@lsp.type.property"]   = { link = "@property" },
     ["@lsp.type.variable"]   = { link = "@variable" },
+    -- self/super arrive as @lsp.type.variable (priority 125), which outranks
+    -- treesitter's @variable.builtin (100) and would paint them plain-variable
+    -- cyan. The defaultLibrary modifier (127) is the narrowest hook that hits
+    -- only them, so teal wins back — same color as ruby's @foo.
+    ["@lsp.typemod.variable.defaultLibrary"] = { fg = c.teal_var },
     ["@lsp.type.function"]   = { link = "@function" },
     ["@lsp.type.method"]     = { link = "@function.method" },
     ["@lsp.type.keyword"]    = { link = "@keyword" },
@@ -173,5 +184,12 @@ return function(c, opts)
     -- Ruby: clear implicit-self method token so treesitter @variable (teal) shows
     -- for bare calls while explicit .method calls keep @function.method.call (blue).
     ["@lsp.type.method.ruby"] = {},
+    -- Ruby: clear the parameter token too. Ruby LSP tags every reference to a
+    -- parameter, method or block alike, so params stayed salmon throughout the
+    -- body. Cleared, treesitter takes over and only the binding sites
+    -- (`def foo(items)`, `|n|`) are salmon; body references fall back to
+    -- @variable. Treesitter has no scope resolution, so `n` inside the block
+    -- reads as a plain variable — that's the cost of getting `items` back.
+    ["@lsp.type.parameter.ruby"] = {},
   }
 end

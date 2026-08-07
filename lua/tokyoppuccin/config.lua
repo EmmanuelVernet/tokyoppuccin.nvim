@@ -6,6 +6,10 @@ M.defaults = {
   style = "storm", -- only variant for now; loader is keyed on style
   transparent = false, -- clear Normal / NormalFloat / SignColumn backgrounds
   terminal_colors = true, -- set vim.g.terminal_color_*
+  -- Opt-in Ruby treesitter query overrides (extras/queries/). Off by default: a
+  -- colorscheme changing what the *parser* captures is surprising, and the change
+  -- outlives switching to another theme. See README "Ruby query overrides".
+  ruby_queries = false,
   styles = {
     comments = { italic = true },
     keywords = {},
