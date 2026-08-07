@@ -95,6 +95,10 @@ return function(c, opts)
     -- functions
     ["@function"]              = fn({ fg = c.blue }),
     ["@function.builtin"]      = { fg = c.orange },
+    -- Ruby scopes @function.builtin to exactly nine declarative macros
+    -- (attr_*, module_function, include/extend/prepend/refine/using) — `puts` and
+    -- friends are not in it — so this narrows cleanly without a query override.
+    ["@function.builtin.ruby"] = { fg = c.declaration },
     ["@function.call"]         = fn({ fg = c.blue }),
     ["@function.macro"]        = { fg = c.teal },
     ["@function.method"]       = fn({ fg = c.blue }),
