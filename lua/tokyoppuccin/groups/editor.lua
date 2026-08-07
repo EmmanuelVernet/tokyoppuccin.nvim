@@ -47,6 +47,15 @@ return function(c, opts)
     WinBar       = { fg = c.fg_editor, bg = bg },
     WinBarNC     = { fg = c.fg_muted, bg = bg },
 
+    -- LSP document highlight: the marks put on every occurrence of the symbol
+    -- under the cursor. Undefined, these link to Visual, so an LSP reference is
+    -- indistinguishable from text you actually selected — bg_active is dimmer and
+    -- distinct. Write gets the brighter element_hover so assignment stands out.
+    LspReferenceText  = { bg = c.bg_active },
+    LspReferenceRead  = { bg = c.bg_active },
+    LspReferenceWrite = { bg = c.element_hover },
+    LspSignatureActiveParameter = { bg = c.bg_active, bold = true },
+
     -- Diagnostics (Zed severities: error red, warn yellow, info teal, hint hint)
     DiagnosticError = { fg = c.red },
     DiagnosticWarn  = { fg = c.yellow },
