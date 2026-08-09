@@ -15,7 +15,7 @@ local M = {}
 
 function M.get(style)
 	local c = require("tokyoppuccin.palette").get(style)
-	local bar, off, vis, sel = c.bg, c.element, c.surface, c.bg_active
+	local bar, off, vis, sel = c.bg, c.bg, c.surface, c.bg_active
 
 	local hl = {
 		fill = { fg = c.comment, bg = bar },
