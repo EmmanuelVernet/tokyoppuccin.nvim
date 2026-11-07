@@ -4,7 +4,7 @@ local M = {}
 
 M.defaults = {
   style = "storm", -- only variant for now; loader is keyed on style
-  transparent = false, -- clear Normal / NormalFloat / SignColumn backgrounds
+  transparent = false, -- clear editor/float/statusline/bufferline bgs; cursorline follows the terminal bg
   terminal_colors = true, -- set vim.g.terminal_color_*
   -- Opt-in Ruby treesitter query overrides (extras/queries/). Off by default: a
   -- colorscheme changing what the *parser* captures is surprising, and the change

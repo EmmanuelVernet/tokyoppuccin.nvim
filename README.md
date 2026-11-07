@@ -87,7 +87,7 @@ later. The only override that survives is bufferline's own `highlights` key:
 ```lua
 {
   "akinsho/bufferline.nvim",
-  opts = { highlights = require("tokyoppuccin.bufferline").get() },
+  opts = { highlights = function() return require("tokyoppuccin.bufferline").get() end },
 }
 ```
 
@@ -98,7 +98,7 @@ later. The only override that survives is bufferline's own `highlights` key:
 ```lua
 require("tokyoppuccin").setup({
   style = "storm",
-  transparent = false,      -- clear Normal/NormalFloat/SignColumn backgrounds
+  transparent = false,      -- clear editor/float/statusline/bufferline bgs; cursorline follows the terminal bg
   terminal_colors = true,   -- set vim.g.terminal_color_*
   ruby_queries = false,     -- opt-in treesitter overrides, see below
   styles = {
@@ -117,6 +117,44 @@ require("tokyoppuccin").setup({
 
 There is no `plugins = { all, auto }` option — `groups/plugins/init.lua` is a
 hand-maintained `enabled` list on purpose. Add a file, add its name.
+
+### Transparent
+
+Set it in `opts` (or `setup()`) before `:colorscheme`:
+
+```lua
+{
+  "EmmanuelVernet/tokyoppuccin.nvim",
+  lazy = false,
+  priority = 1000,
+  opts = { transparent = true },
+  config = function(_, opts)
+    require("tokyoppuccin").setup(opts)
+    vim.cmd.colorscheme("tokyoppuccin")
+  end,
+}
+```
+
+The editor, floats, sign column, statusline, lualine's middle section and
+bufferline's strip and inactive tabs drop their background, so the terminal's
+shows through. Things that need a fill to read keep one: lualine's `a` (mode)
+and `b` sections, the visible and selected bufferline tabs, popup menus, folds,
+cursorline, visual selection and search matches.
+
+Those fills are re-mixed over the terminal's real background rather than the
+storm one, so they still sit right on any terminal theme. The theme asks the
+terminal for its background (OSC 11) on every load and whenever Neovim regains
+focus, and reloads if it changed, so switching the terminal's theme is picked
+up. On a light terminal background the neutral fills mix darker instead of
+lighter. A terminal that doesn't answer OSC 11 still gets the transparency; the
+fills just stay mixed over the storm background.
+
+bufferline needs the **function** form of `highlights` (see
+[bufferline.nvim](#bufferlinenvim)) — with the table form the tabs keep the
+colors computed at startup and won't follow a background change.
+
+The flag is read when the colorscheme loads. Flipping it later takes effect on
+the next `:colorscheme tokyoppuccin`.
 
 ### Ruby query overrides
 
