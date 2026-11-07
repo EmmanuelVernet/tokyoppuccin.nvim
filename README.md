@@ -87,7 +87,7 @@ later. The only override that survives is bufferline's own `highlights` key:
 ```lua
 {
   "akinsho/bufferline.nvim",
-  opts = { highlights = require("tokyoppuccin.bufferline").get() },
+  opts = { highlights = function() return require("tokyoppuccin.bufferline").get() end },
 }
 ```
 
@@ -98,7 +98,7 @@ later. The only override that survives is bufferline's own `highlights` key:
 ```lua
 require("tokyoppuccin").setup({
   style = "storm",
-  transparent = false,      -- clear Normal/NormalFloat/SignColumn backgrounds
+  transparent = false,      -- clear editor/float/statusline/bufferline bgs; cursorline follows the terminal bg
   terminal_colors = true,   -- set vim.g.terminal_color_*
   ruby_queries = false,     -- opt-in treesitter overrides, see below
   styles = {

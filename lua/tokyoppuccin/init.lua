@@ -48,6 +48,39 @@ vim.api.nvim_create_autocmd("ColorSchemePre", {
   end,
 })
 
+-- transparent: theme.build re-bakes cursor_line over the terminal's real bg, so
+-- track it from OSC 11 replies. nvim's own startup query is answered before user
+-- config loads, so ask again on every load and when focus returns (switching the
+-- terminal's theme usually takes focus off the pane). Reload only on change, so
+-- the load -> query -> reply round trip can't loop.
+local function parse_osc11(seq)
+  local r, g, b = seq:match("^\027%]11;rgba?:(%x+)/(%x+)/(%x+)")
+  if not r then return end
+  local ch = function(h) return math.floor(tonumber(h, 16) / (16 ^ #h - 1) * 255 + 0.5) end
+  return string.format("#%02x%02x%02x", ch(r), ch(g), ch(b))
+end
+
+local function query_term_bg()
+  if require("tokyoppuccin.config").extend().transparent then
+    vim.api.nvim_ui_send("\027]11;?\007")
+  end
+end
+
+local term_bg_group = vim.api.nvim_create_augroup("TokyoppuccinTermBg", { clear = true })
+vim.api.nvim_create_autocmd("TermResponse", {
+  group = term_bg_group,
+  nested = true, -- let lualine/bufferline see the ColorScheme reload
+  callback = function(ev)
+    local bg = parse_osc11(ev.data.sequence)
+    if not bg or bg == vim.g.tokyoppuccin_term_bg then return end
+    vim.g.tokyoppuccin_term_bg = bg
+    if vim.startswith(vim.g.colors_name or "", "tokyoppuccin") then
+      vim.cmd.colorscheme(vim.g.colors_name)
+    end
+  end,
+})
+vim.api.nvim_create_autocmd("FocusGained", { group = term_bg_group, callback = query_term_bg })
+
 function M.setup(opts)
   require("tokyoppuccin.config").setup(opts)
 end
@@ -77,6 +110,8 @@ function M.load(style)
       vim.g["terminal_color_" .. (i - 1)] = hex
     end
   end
+
+  query_term_bg()
 end
 
 return M

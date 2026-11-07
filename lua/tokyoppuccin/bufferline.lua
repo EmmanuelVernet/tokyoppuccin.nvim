@@ -5,7 +5,10 @@
 -- theme sets is clobbered a moment later. The only override that survives is
 -- the `highlights` key of bufferline's own setup:
 --
---   opts = { highlights = require("tokyoppuccin.bufferline").get() }
+--   opts = { highlights = function() return require("tokyoppuccin.bufferline").get() end }
+--
+-- Pass the function, not its result: bufferline re-calls it on ColorScheme, so
+-- the tabs follow a terminal bg change under `transparent`.
 --
 -- Ramp follows Zed's tab bar, not bufferline's default shading (which darkens
 -- Normal by -45 and turns the empty strip into a black void):
@@ -14,8 +17,12 @@
 local M = {}
 
 function M.get(style)
-	local c = require("tokyoppuccin.palette").get(style)
-	local bar, off, vis, sel = c.bg, c.bg, c.surface, c.bg_active
+	local c, opts = require("tokyoppuccin.theme").colors(style and { style = style })
+	-- transparent: the strip and inactive tabs let the terminal bg through; the
+	-- visible/selected pills keep a fill (re-mixed over the terminal bg) so the
+	-- current buffer still reads.
+	local clear = opts.transparent and "NONE" or c.bg
+	local bar, off, vis, sel = clear, clear, c.surface, c.bg_active
 
 	local hl = {
 		fill = { fg = c.comment, bg = bar },
@@ -28,13 +35,13 @@ function M.get(style)
 		indicator_selected = { fg = c.blue, bg = sel },
 		tab = { fg = c.fg_muted, bg = off },
 		tab_selected = { fg = c.fg, bg = sel },
-		tab_separator = { fg = bar, bg = off },
-		tab_separator_selected = { fg = bar, bg = sel },
+		tab_separator = { fg = c.bg, bg = off },
+		tab_separator_selected = { fg = c.bg, bg = sel },
 		tab_close = { fg = c.red, bg = bar },
 		offset_separator = { fg = c.border, bg = bar },
 		trunc_marker = { fg = c.comment, bg = bar },
 		group_separator = { fg = c.comment, bg = bar },
-		group_label = { fg = bar, bg = c.comment },
+		group_label = { fg = c.bg, bg = c.comment },
 	}
 
 	-- Every group that sits *on* a tab has to carry that tab's background, or the
@@ -55,7 +62,7 @@ function M.get(style)
 		warning_diagnostic = { c.yellow, c.yellow, c.yellow },
 		info_diagnostic = { c.diag_info, c.diag_info, c.diag_info },
 		hint_diagnostic = { c.hint, c.hint, c.hint },
-		separator = { bar, bar, bar },
+		separator = { c.bg, c.bg, c.bg },
 	}
 	for name, fgs in pairs(families) do
 		for i, state in ipairs(states) do
